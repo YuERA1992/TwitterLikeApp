@@ -6,7 +6,10 @@
     <div class="btns">
       <!-- ここから追加 -->
       <div v-if="currentUser" class="btns">
+        <router-link :to="'/user/'+currentUser.uid">
         <button :style="'background-image: url('+currentUser.photoURL+')'"></button>
+        </router-link>
+        
         <button>
           
           <fa icon="sign-out-alt" @click="signOut" />
