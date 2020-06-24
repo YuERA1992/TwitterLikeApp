@@ -1,22 +1,12 @@
 <template>
   <div class="home">
     <div class="list">
-      <li v-for="whisper in orderBy(TwitterLikeApp,'date',-1)" :key="whisper.id" class="item"> <!-- 'v-for'の中身を変更-->
-        <!-- {{whisper.content}}
-        {{whisper.userId}} -->
-        <!-- ここを追加 -->
-        <div class="user-box">
-          <div 
-            class="avatar"
-            :style="'background-image: url('+url+')'"
-          >
-          </div>
-          <p class="user-name">{{whisper.uid}}</p>
-        </div>
-        <div class="content" v-html="whisper.content">
-        </div>
-        <!-- ここまで追加 -->
-      </li>
+      <Item 
+        v-for="whisper in orderBy(TwitterLikeApp,'date',-1)"
+        :key="whisper.id"
+        :id="whisper.id"
+        :uid="whisper.userId" 
+      />
     </div>
   </div>
 </template>
@@ -24,12 +14,15 @@
 <script>
 // @ is an alias to /src
 
+import Item from '@/components/Item' 
+
+
 import { db } from '../main' 
 
 import Vue2Filters from 'vue2-filters' 
 
 export default {
-  name: 'Home',
+  name: 'home',
   
   // ここから追加
   data () {
@@ -42,9 +35,12 @@ export default {
       TwitterLikeApp: db.collection('TwitterLikeApp')
     }
   },
+  // ここから追加
   components: {
-    
+    Item
   },
+  // ここまで追加
+ 
   // ここを追加
   mixins: [Vue2Filters.mixin] 
   //ここまで追加

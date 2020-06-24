@@ -7,11 +7,31 @@
 
         <p class="user-name">{{user.name}}</p> <!-- ここを変更 -->
         
-      </div>
+    </div>
     <div class="content" v-html="whisper.content">
     </div>
   </li>
 </template>
+
+<script>
+import { db } from '../main'
+
+export default {
+  props: ['id','uid'],
+  data () {
+    return {
+      whisper: {},
+      user: {}
+    }
+  },
+  firestore () {
+    return {
+      whisper: db.collection('whispers').doc(this.$props.id),
+      user: db.collection('users').doc(this.$props.uid)
+    }
+  }
+}
+</script>
 
 <style lang="stylus">
 .item
