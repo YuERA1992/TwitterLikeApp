@@ -5,9 +5,9 @@
       <p class="user-name">{{currentUser.displayName}}</p>
     </div>
     <div class="editor">
-      <textarea placeholder="new whisper">
+      <textarea placeholder="new whisper" v-model="newWhisper" @keypress.enter="createWhisper"> <!-- 'v-model','@keypress.enter'を追加 -->
       </textarea>
-      <p class="message">Press Enter to Whisper</p>
+      <p class="message">Enterで呟くで</p>
     </div>
   </li>
 </template>
@@ -28,7 +28,7 @@ export default {
       db.collection('whispers').add({
         'content': this.newWhisper,
         'date': date,
-        'uid': this.$props.currentUser.uid
+        'userId': this.$props.currentUser.userId
       })
       .then(
         this.newWhisper = ''

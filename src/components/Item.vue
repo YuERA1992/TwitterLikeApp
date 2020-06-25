@@ -8,28 +8,84 @@
         <p class="user-name">{{user.name}}</p> <!-- ここを変更 -->
         
     </div>
-    <div class="content" v-html="whisper.content">
+
+    <div v-if="editing" class="editor">
+      <textarea v-model="whisper.content" placeholder="edit whisper" @keypress.enter="updateWhisper">>
+      </textarea>
+      <p class="message">Press Enter to Whisper</p>
     </div>
+    
+    <div v-else class="content" v-html="whisper.content">
+    </div>
+    <!-- ここから追加 -->
+    <button v-if="currentUser && currentUser.userId == user.id" @click="showBtns = !showBtns">
+      <fa icon="ellipsis-v" />
+    </button>
+    <!-- ここまで追加 -->
+    <!-- ここから追加 -->
+    <div v-if="showBtns" class="controls">
+      <li @click="editing = !editing">edit</li>
+      <li @click="deleteWhisper" style="color: red">
+        delete
+      </li>
+    </div>
+    <!-- ここまで追加 -->
+ 
+
   </li>
 </template>
 
 <script>
 import { db } from '../main'
+import { auth } from '../main' // ここを追加
 
 export default {
-  props: ['id','uid'],
+  props: ['id','userId'],
   data () {
     return {
       whisper: {},
-      user: {}
+      user: {},
+      currentUser: {}, // ここを追加
+      showBtns: false, // ここを追加
+      editing: false // ここを追加
     }
   },
+  // ここから追加
+  created () {
+    auth.onAuthStateChanged(user => {
+      this.currentUser = user
+    })
+  },
+  // ここまで追加
+ 
   firestore () {
     return {
       whisper: db.collection('whispers').doc(this.$props.id),
-      user: db.collection('users').doc(this.$props.uid)
+      user: db.collection('users').doc(this.$props.userId)
     }
-  }
+  },
+  // ここから追加
+  methods: {
+    deleteWhisper () {
+      if (window.confirm('Are You Sure to Delete This Whisper?')) {
+        db.collection('whispers').doc(this.$props.id).delete()
+      }
+    },
+    // ここから追加
+    updateWhisper () {
+      const date = new Date()
+      db.collection('whispers').doc(this.whisper.id).set({
+        'content': this.whisper.content,
+        'date': date
+      }, { merge: true })
+      .then(
+        this.editing = false
+      )
+    }
+    // ここまで追加
+  },
+  // ここまで追加
+ 
 }
 </script>
 
@@ -88,4 +144,38 @@ export default {
       width 50px
   .content
     padding 10px
+  /* ここから追加 */
+  button
+    position absolute
+    top 5px
+    right 0
+    background transparent
+    color #555
+    font-size .9rem
+    opacity 0
+    transition .2s
+  .controls
+    background white
+    position absolute
+    top 5px
+    right 35px
+    box-shadow 0 0 5px rgba(0,0,0,.05)
+    border-radius 3px
+    opacity 0
+    li
+      padding 5px 20px
+      border-top 1px solid #eee
+      cursor pointer
+      &:first-child
+        border none
+  &:first-child
+    border none
+  &:hover
+    background rgba(0,0,0,.02)
+    .content
+    button
+      opacity 1
+    .controls
+      opacity 1
+  /* ここまで追加 */
 </style>
